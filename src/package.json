@@ -1,0 +1,17 @@
+{
+  "name": "src",
+  "version": "1.0.0",
+  "description": "Simulated Azure IoT Device",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "azure-iot-device-amqp": "^1.0.6",
+    "azure-iothub": "^1.0.8",
+    "azure-storage": "^1.0.1",
+    "nconf": "^0.8.4"
+  }
+}

@@ -1,0 +1,12 @@
+{
+    "STORAGE_NAME": "stgaccdatafactory",
+    "STORAGE_KEY": "tMOg9hxbxPGmNqwFOPE29rHUkE5oV8JvMok4wGNL3gMBCXXuXald+I3PJy+KA7v+vAxa3sR91z5vJQ75shm5wA==",
+    "CAPITAL_PARTITION_KEY": "Capitals",
+    "CAPITAL_TABLE_NAME": "Capital",
+    "WEATHER_PARTITION_KEY": "MainSensors",
+    "WEATHER_TABLE_NAME": "Weather",
+    "IOT_HOST_NAME":"IoTHubSample01.azure-devices.net",
+    "IOT_SHARED_ACCESS_KEY_NAME":"iothubowner",
+    "IOT_SHARED_ACCESS_KEY": "EGHFck8ECs1/rrk/SWa3oM64sK3UKx3cCXPFFbZpWII="
+
+}
