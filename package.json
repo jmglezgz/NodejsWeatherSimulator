@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "azure-iot-device": "^1.0.7",
     "azure-iot-device-amqp": "^1.0.6",
     "azure-iothub": "^1.0.8",
     "azure-storage": "^1.0.1",
