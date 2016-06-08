@@ -4,7 +4,9 @@
 var device = require ('./CreateDeviceIdentity');
 var azure = require ('azure-storage')
 var sendMessage = require ('./SimulatedDevice');
-var TableStorage = require ('./models/TableStorage');
+var tableStorage = require ('./models/TableStorage');
+var _ = require('underscore');
+
 var fs = require('fs');
 
 //
@@ -21,47 +23,53 @@ var IoTHostName = nconf.get("IOT_HOST_NAME");
 var IoTSharedAccessKeyName = nconf.get("iothubowner");
 var IoTSharedAccessKey = nconf.get("EGHFck8ECs1/rrk/SWa3oM64sK3UKx3cCXPFFbZpWII=");
 
-//Import Capital Data
+
+//Get Capital and Insert into Table Storage with DeviceId
 var capitalTableName = nconf.get ("CAPITAL_TABLE_NAME");
 var capitalPartitionKey = nconf.get ("CAPITAL_PARTITION_KEY");
 
 var capitals = JSON.parse(fs.readFileSync('./data/capitals.json', 'utf8'));
+var capitalTable = new tableStorage( azure.createTableService(accountName,accountKey), capitalTableName, capitalPartitionKey,function (error, result, response){
+    if (error){
+        throw error;
+    }
+    var weather = false;
+    AsignCapital (capitals, 0,null);
 
-AsignCapital (capitals, 0, sensorPlace);
+    function AsignCapital (Capitals, i, place){
+    if (i < capitals.length & place == null){
+        capitalTable.addCapital (Capitals[i], function itemAdded (error){
+            if (error) {
+                i += 1;
+                AsignCapital (Capitals, i, place);
+            }
+            if (!weather){
+                place = Capitals[i];            
+                //Import Wetather Data Table
+                var weatherTableName = nconf.get ("WEATHER_TABLE_NAME");
+                var weatherPartitionKey = nconf.get ("WEATHER_PARTITION_KEY");
 
-function AsignCapital (Capitals, i, place){
-if (i < capitals.lenght & place == null){
-    capitalTable.addCapital (Capitals[i], function itemAdded (error){
-        if (error) {
-            i += 1;
-            AsignCapital (Capitals, i, place);
-        }else{
-            place = Capitals[i];            
-        }    
-    });
-}}
-// //Import Wetather Data Table
-// var weatherTableName = nconf.get ("WEATHER_TABLE_NAME");
-// var weatherPartitionKey = nconf.get ("WEATHER_PARTITION_KEY");
+                var weatherTable = new tableStorage(azure.createTableService(accountName,accountKey), weatherTableName, weatherPartitionKey, function (error, result, respond){
+                        if (error){
+                            throw error;
+                        }
+                        var weatherData = JSON.parse(fs.readFileSync('./data/weatherData.json', 'utf8'));
+                        var capitalWeather = _.where(weatherData, {PartitionKey: place.RowKey});
 
-// var weatherTable = new TableStorage(azure.createTableService(accountName,accountKey), weatherTableName, weatherPartitionKey, function (error, result, respond){
-//         if (error){
-//             throw error;
-//         }
-//         var weatherData = JSON.parse(fs.readFileSync('./src/data/weatherData.json', 'utf8'));
-//         for (var i in weatherData){
-//             weatherTable.addWeather (weatherData[i], function itemAdded (error){
-//                 if (error){
-//                     throw error;
-//                 }
-//             });
-//         }
-        
-//     });
-
-
-
-
+                        for (var RowKey in capitalWeather){
+                            weatherTable.addWeather (capitalWeather[RowKey], function itemAdded (error){
+                                if (error){
+                                    throw error;
+                                }
+                            });
+                        }
+                        weather = true;
+                    });
+                }
+            });
+        }
+    }
+})
 
 //Define connectionString with your custom IoTHub connection String.
 // var connectionString = 'HostName=' + IoTHostName + ';SharedAccessKeyName=' + IoTSharedAccessKeyName + ';SharedAccessKey=' + IoTSharedAccessKey;
